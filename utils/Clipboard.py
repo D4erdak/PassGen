@@ -41,7 +41,6 @@ def copy_to_clipboard(text: Union[str, int, float]) -> bool:
         pyperclip.copy(text_str)
         return True
     except pyperclip.PyperclipException:
-        # Логирование ошибки можно добавить при необходимости
         return False
     except Exception as e:
         # Перехват всех остальных исключений

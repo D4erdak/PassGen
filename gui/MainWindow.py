@@ -1,30 +1,11 @@
-"""
-Модуль главного окна приложения "Генератор паролей PRO".
-
-Содержит класс MainWindow, который реализует графический интерфейс пользователя
-с использованием библиотеки Tkinter.
-"""
-
 import tkinter as tk
 from tkinter import ttk
 from generator.PasswordGeneration import generate_password
 from utils.Clipboard import copy_to_clipboard
-
+from gui.CheckWindow import CheckWindow  # Импортируем класс окна проверки
 
 class MainWindow:
-    """
-    Класс главного окна приложения.
-
-    Отвечает за создание и управление всеми элементами интерфейса.
-    """
-
     def __init__(self, master: tk.Tk) -> None:
-        """
-        Инициализация главного окна.
-
-        Параметры:
-            master (tk.Tk): Корневое окно Tkinter
-        """
         self.master = master
         self.setup_window()
         self.setup_style()
@@ -32,17 +13,13 @@ class MainWindow:
         self.setup_bindings()
 
     def setup_window(self) -> None:
-        """Настройка основных параметров окна."""
         self.master.title("🔐 Генератор паролей PRO")
         self.master.geometry("800x600")
         self.master.resizable(False, False)
         self.master.configure(bg="#f0f0f0")
-
-        # Центрирование окна на экране
         self.center_window()
 
     def center_window(self) -> None:
-        """Центрирует окно на экране."""
         self.master.update_idletasks()
         width = self.master.winfo_width()
         height = self.master.winfo_height()
@@ -51,60 +28,66 @@ class MainWindow:
         self.master.geometry(f'+{x}+{y}')
 
     def setup_style(self) -> None:
-        """Настройка стилей виджетов."""
         self.style = ttk.Style()
+        self.style.configure("TFrame", background="#f0f0f0", relief="flat")
 
-        # Общие настройки стилей
-        self.style.configure(
-            "TFrame",
-            background="#f0f0f0",
-            relief="flat"
-        )
-
-        # Стиль для кнопок
+        # Стиль для основных кнопок
         self.style.configure(
             "TButton",
             font=("Arial", 12),
             padding=10,
             background="#4CAF50",
             foreground="black",
-            borderwidth=1,
-            focuscolor="#4CAF50"
+            borderwidth=1
         )
-
-        # Состояния кнопок
         self.style.map(
             "TButton",
-            background=[("active", "#45a049"), ("disabled", "#cccccc")],
-            foreground=[("active", "white"), ("disabled", "#888888")]
+            background=[("active", "#45a049")],
+            foreground=[("active", "white")]
         )
 
-        # Стиль для поля ввода
+        # Стиль для кнопки перехода
         self.style.configure(
-            "TEntry",
-            font=("Consolas", 16),
-            foreground="#2c3e50",
-            padding=8,
-            relief="solid"
+            "Nav.TButton",
+            font=("Arial", 10),
+            padding=5,
+            background="#3498db",
+            foreground="Black"
+        )
+        self.style.map(
+            "Nav.TButton",
+            background=[("active", "#2980b9")]
         )
 
     def create_widgets(self) -> None:
-        """Создание и размещение виджетов в окне."""
-        # Основной контейнер
         self.main_frame = ttk.Frame(self.master)
         self.main_frame.pack(pady=50, padx=50, fill="both", expand=True)
 
-        # Заголовок
         self.create_header()
-
-        # Поле для отображения пароля
         self.create_password_display()
-
-        # Кнопка генерации
         self.create_generate_button()
-
-        # Панель управления
         self.create_control_panel()
+
+        nav_frame = ttk.Frame(self.main_frame)
+        nav_frame.pack(fill="y", pady=(0, 20))
+
+        ttk.Button(
+            nav_frame,
+            text="🔍 Проверить пароль",
+            command=self.open_check_window,
+            style="Nav.TButton"
+        ).pack(side="right")
+
+    def open_check_window(self) -> None:
+        """Открывает окно проверки пароля"""
+        # Создаем новое окно
+        check_window = tk.Toplevel(self.master)
+        CheckWindow(check_window)  # Инициализируем окно проверки
+
+        # Центрируем новое окно относительно главного
+        check_window.transient(self.master)
+        check_window.grab_set()
+
 
     def create_header(self) -> None:
         """Создает заголовок приложения."""
